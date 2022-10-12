@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import SeasonDisplay from "./SeasonDisplay";
+import Loading from "./Loading";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  const [lat, setLat] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+
+  window.navigator.geolocation.getCurrentPosition(
+    (position) => {
+      //update state
+      setLat(position.coords.latitude);
+    },
+    (err) => {
+      setErrMsg(err.message);
+    }
   );
+
+  //create function before return and render
+  const renderContent = () => {
+    if (errMsg && !lat) {
+      return (
+        <div>
+          <Loading msg={`Error: ${errMsg}`} />
+        </div>
+      );
+    } else if (lat && !errMsg) {
+      return <SeasonDisplay lat={lat} />;
+    } else {
+      return (
+        <div>
+          <Loading msg="Please accept the location request ..." />
+        </div>
+      );
+    }
+  };
+
+  //return statement
+  return renderContent();
 }
 
 export default App;
